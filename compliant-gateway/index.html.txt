@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Merchant Checkout</title>
+    <!-- Load the official, certified payment gateway library -->
+    <script src="https://stripe.com"></script>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f9f9f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .checkout-box { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 380px; }
+        h2 { color: #333; margin-bottom: 20px; }
+        .form-row { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; color: #666; font-size: 14px; }
+        input[type="text"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        /* The container where the secure external card input field will be injected */
+        #card-element { padding: 12px; border: 1px solid #ccc; border-radius: 4px; background: #fff; }
+        .pay-btn { background-color: #5469d4; color: white; border: none; padding: 12px; width: 100%; border-radius: 4px; font-size: 16px; cursor: pointer; margin-top: 20px; font-weight: bold; }
+        .pay-btn:hover { background-color: #4354b5; }
+        #error-message { color: #df1b41; font-size: 14px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="checkout-box">
+    <h2>Secure Checkout</h2>
+    <form id="payment-form">
+        <div class="form-row">
+            <label for="cardholder-name">Cardholder Name</label>
+            <input type="text" id="cardholder-name" placeholder="John Doe" required>
+        </div>
+        
+        <div class="form-row">
+            <label>Credit or Debit Card</label>
+            <!-- Certified gateway input container -->
+            <div id="card-element"></div>
+            <div id="error-message" role="alert"></div>
+        </div>
+
+        <button class="pay-btn" id="submit-button">Submit Secure Payment</button>
+    </form>
+</div>
+
+<script>
+    // Initialize the gateway using your official Merchant Public API Key
+    const stripe = Stripe('pk_live_your_merchant_public_key_placeholder');
+    const elements = stripe.elements();
+
+    // Create and style the secure card input element
+    const cardElement = elements.create('card', {
+        style: {
+            base: { fontSize: '16px', color: '#32325d', '::placeholder': { color: '#aab7c4' } }
+        }
+    });
+
+    // Mount the secure input field into our DOM container
+    cardElement.mount('#card-element');
+
+    const form = document.getElementById('payment-form');
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        document.getElementById('submit-button').disabled = true;
+
+        // Tokenize the card details directly on the provider's secure server
+        const { token, error } = await stripe.createToken(cardElement, {
+            name: document.getElementById('cardholder-name').value
+        });
+
+        if (error) {
+            document.getElementById('error-message').textContent = error.message;
+            document.getElementById('submit-button').disabled = false;
+        } else {
+            // Send the safe token string to your server backend
+            sendTokenToServer(token.id);
+        }
+    });
+
+    async function sendTokenToServer(tokenId) {
+        // Send an un-hackable reference token to your backend API for clearing
+        const response = await fetch('/api/process-charge', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token: tokenId })
+        });
+        
+        if (response.ok) {
+            alert('Payment completed successfully via secure tokenization!');
+        } else {
+            alert('Payment execution failed on the server side.');
+        }
+    }
+</script>
+</body>
+</html>
