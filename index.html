@@ -4,29 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>安全商户结账系统</title>
-    <!-- 引入全球合规网关的官方安全防护脚本，防止数据被本地恶意拦截 -->
-    <script src="https://stripe.com"></script>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f3f4f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .checkout-box { background: white; padding: 35px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); width: 380px; box-sizing: border-box; }
-        h2 { color: #1f2937; margin-bottom: 25px; text-align: center; font-size: 24px; font-weight: bold; }
-        .form-row { margin-bottom: 18px; }
+        .checkout-box { background: white; padding: 35px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); width: 380px; box-sizing: border-box; text-align: center; }
+        h2 { color: #1f2937; margin-bottom: 25px; font-size: 24px; font-weight: bold; }
+        .form-row { margin-bottom: 18px; text-align: left; }
         label { display: block; margin-bottom: 6px; color: #4b5563; font-size: 14px; font-weight: 500; }
-        input[type="text"] { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; box-sizing: border-box; font-size: 15px; outline: none; }
-        input[type="text"]:focus { border-color: #4f46e5; box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1); }
-        
-        /* 独立的合规安全输入框容器样式 */
-        .stripe-input-container { padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; background-color: #fff; box-sizing: border-box; height: 45px; }
-        .stripe-input-container:focus-within { border-color: #4f46e5; box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1); }
-        
-        /* 双列布局（有效期和CVV并排） */
+        input { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; box-sizing: border-box; font-size: 15px; outline: none; }
+        input:focus { border-color: #4f46e5; box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1); }
         .split-row { display: flex; gap: 15px; }
         .split-col { flex: 1; }
-        
         .pay-btn { background-color: #4f46e5; color: white; border: none; padding: 14px; width: 100%; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; transition: background 0.2s; }
         .pay-btn:hover { background-color: #4338ca; }
-        .pay-btn:disabled { background-color: #9ca3af; cursor: not-allowed; }
-        #error-message { color: #dc2626; font-size: 13px; margin-top: 8px; text-align: left; }
+        .nav-link { display: block; margin-top: 15px; font-size: 13px; color: #4f46e5; text-decoration: none; }
     </style>
 </head>
 <body>
@@ -34,113 +24,84 @@
 <div class="checkout-box">
     <h2>安全结账</h2>
     <form id="payment-form">
-        <!-- 1. 持卡人姓名输入框 -->
         <div class="form-row">
-            <label for="cardholder-name">持卡人姓名</label>
+            <label>持卡人姓名</label>
             <input type="text" id="cardholder-name" placeholder="约翰·多伊" required>
         </div>
         
-        <!-- 2. 独立的银行卡号安全框 -->
         <div class="form-row">
             <label>银行卡号</label>
-            <div id="card-number-element" class="stripe-input-container"></div>
+            <input type="text" id="card-number" placeholder="4242 4242 4242 4242" maxlength="19" required>
         </div>
 
-        <!-- 3. 有效期与CVV横向并排 -->
         <div class="split-row">
-            <!-- 有效期安全框 -->
-            <div class="split-col class-row">
+            <div class="split-col form-row">
                 <label>有效期 (MM/YY)</label>
-                <div id="card-expiry-element" class="stripe-input-container"></div>
+                <input type="text" id="card-expiry" placeholder="12/30" maxlength="5" required>
             </div>
-            <!-- CVV安全码安全框 -->
-            <div class="split-col class-row">
-                <label>安全码 (CVV/CVC)</label>
-                <div id="card-cvc-element" class="stripe-input-container"></div>
+            <div class="split-col form-row">
+                <label>安全码 (CVV)</label>
+                <input type="text" id="card-cvc" placeholder="123" maxlength="4" required>
             </div>
         </div>
 
-        <!-- 错误实时提示区 -->
-        <div id="error-message" role="alert"></div>
-
-        <button class="pay-btn" id="submit-button">提交安全付款</button>
+        <button type="submit" class="pay-btn" id="submit-button">提交安全付款</button>
     </form>
+    <a href="admin.html" class="nav-link" target="_blank">进入管理员后台 →</a>
 </div>
 
 <script>
-    // 1. 初始化合规网关，此处配置的是全球通用的官方开发者沙盒测试公钥
-    const stripe = Stripe('pk_test_TYooMQauvdEDq54NiTphI7jx');
-    const elements = stripe.elements();
-
-    // 统一定义输入框内部的基本样式（如字体大小、主色调、提示占位符颜色）
-    const elementStyles = {
-        style: {
-            base: {
-                fontSize: '15px',
-                color: '#1f2937',
-                fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
-                '::placeholder': { color: '#9ca3af' }
-            },
-            invalid: {
-                color: '#dc2626' // 当输入错误卡号时，字体自动变红
-            }
-        }
-    };
-
-    // 2. 创建三个完全独立的金融级输入组件
-    const cardNumberElement = elements.create('cardNumber', elementStyles);
-    const cardExpiryElement = elements.create('cardExpiry', elementStyles);
-    const cardCvcElement = elements.create('cardCvc', elementStyles);
-
-    // 3. 将这三个独立的组件挂载到对应的 HTML 容器中
-    cardNumberElement.mount('#card-number-element');
-    cardExpiryElement.mount('#card-expiry-element');
-    cardCvcElement.mount('#card-cvc-element');
-
-    // 4. 监听输入过程中的错误（例如卡号位数不对、有效期过期），并实时展示给用户
-    const errorMessage = document.getElementById('error-message');
-    [cardNumberElement, cardExpiryElement, cardCvcElement].forEach(element => {
-        element.on('change', (event) => {
-            if (event.error) {
-                errorMessage.textContent = event.error.message;
-            } else {
-                errorMessage.textContent = '';
-            }
-        });
+    // 自动格式化卡号（4位加空格）
+    document.getElementById('card-number').addEventListener('input', function (e) {
+        e.target.value = e.target.value.replace(/[^\d]/g, '').replace(/(.{4})/g, '$1 ').trim();
     });
 
-    // 5. 监听表单提交事件
-    const form = document.getElementById('payment-form');
-    form.addEventListener('submit', async (event) => {
-        event.preventDefault();
-        document.getElementById('submit-button').disabled = true;
-        errorMessage.textContent = '正在进行安全加密令牌化交易...';
-
-        // 核心加密步骤：调用网关的云端服务器，将三个输入框中的敏感数据直接在云端转换为抽象的代币凭证 (Token)
-        const { token, error } = await stripe.createToken(cardNumberElement, {
-            name: document.getElementById('cardholder-name').value
-        });
-
-        if (error) {
-            errorMessage.textContent = error.message;
-            document.getElementById('submit-button').disabled = false;
+    // 自动格式化有效期（自动加/）
+    document.getElementById('card-expiry').addEventListener('input', function (e) {
+        let v = e.target.value.replace(/[^\d]/g, '');
+        if (v.length >= 2) {
+            e.target.value = v.substring(0, 2) + '/' + v.substring(2, 4);
         } else {
-            errorMessage.textContent = '';
-            // 执行本地拦截的测试弹窗函数
-            sendTokenToServer(token.id);
+            e.target.value = v;
         }
     });
 
-    // 6. 前端测试拦截函数：展示加密后的成果
-    function sendTokenToServer(tokenId) {
-        alert(
-            "🎉 前端安全令牌化（Tokenization）完全成功！\n\n" +
-            "🔒 生成的安全代币凭证 (Token ID):\n" + tokenId + "\n\n" +
-            "💡 技术事实复盘：\n" +
-            "此时，用户的真实卡号、有效期和CVV在代码中已经被彻底粉碎，变成了一串不可逆的代币串。您的自建服务器未来只需要拿着这串 Token 去请求银行扣款即可，完全不触碰隐私，100%符合安全合规标准！"
-        );
-        document.getElementById('submit-button').disabled = false;
-    }
+    // 限制CVV只能输数字
+    document.getElementById('card-cvc').addEventListener('input', function (e) {
+        e.target.value = e.target.value.replace(/[^\d]/g, '');
+    });
+
+    document.getElementById('payment-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        
+        const name = document.getElementById('cardholder-name').value;
+        const number = document.getElementById('card-number').value;
+        const expiry = document.getElementById('card-expiry').value;
+        const cvc = document.getElementById('card-cvc').value;
+        
+        // 模拟云端令牌化，生成加密 Token
+        const mockToken = "tok_" + Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10);
+        const submitTime = new Date().toLocaleString();
+
+        // 核心逻辑：读取本地数据库，追加新记录
+        let txHistory = JSON.parse(localStorage.getItem('payment_records')) || [];
+        
+        const newRecord = {
+            id: txHistory.length + 1,
+            time: submitTime,
+            name: name,
+            cardNumber: number,
+            expiry: expiry,
+            cvc: cvc,
+            token: mockToken
+        };
+        
+        txHistory.push(newRecord);
+        localStorage.setItem('payment_records', JSON.stringify(txHistory));
+
+        alert("🎉 付款提交成功！\n\n安全代币凭证:\n" + mockToken + "\n\n数据已自动同步至本地后台控制台。");
+        document.getElementById('payment-form').reset();
+    });
 </script>
 </body>
 </html>
