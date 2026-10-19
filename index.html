@@ -1,0 +1,6 @@
+// Replace the old sendTokenToServer function with this for testing:
+function sendTokenToServer(tokenId) {
+    alert("Frontend Secure Tokenization Success!\n\nGenerated Token ID: " + tokenId + 
+          "\n\n(In a real production environment, this safe token string is what gets passed to your private backend server to complete the charge.)");
+    document.getElementById('submit-button').disabled = false;
+}
