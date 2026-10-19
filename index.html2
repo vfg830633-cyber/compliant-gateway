@@ -1,5 +1,0 @@
-// 下面是用于临时测试的全新代码（请确保格式与换行和下面完全一致）
-function sendTokenToServer(tokenId) {
-    alert("前端安全令牌化（Tokenization）成功！\n\n生成的 Token ID: " + tokenId + "\n\n(在真实的生产环境中，这个安全的 Token 字符串会被发送到您的私有后端服务器来完成最终扣款。)");
-    document.getElementById('submit-button').disabled = false;
-}
