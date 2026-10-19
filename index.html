@@ -5,171 +5,150 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TastySlips ® – 你的穿过内衣市场与激发你欲望的一切</title>
     <style>
-        /* 全局暗黑主题样式 - 深度还原截图背景 */
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #121214; color: #e1e1e6; margin: 0; padding: 20px 15px; box-sizing: border-box; }
+        /* 全局深邃暗黑美学基础 */
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #0b0b0c; color: #f3f4f6; margin: 0; padding: 40px 15px; box-sizing: border-box; }
         .market-container { max-width: 1200px; margin: 0 auto; }
         
-        /* 顶部横幅及描述信息 */
-        .header { margin-bottom: 30px; text-align: left; }
-        .header h1 { font-size: 22px; font-weight: bold; margin-bottom: 12px; color: #fff; line-height: 1.3; }
-        .header p { font-size: 14px; color: #a8a8b3; line-height: 1.5; margin: 6px 0; }
-        .highlight { color: #4f46e5; font-weight: bold; }
+        /* 顶部横幅文案深度对齐 */
+        .header { margin-bottom: 40px; text-align: left; }
+        .header h1 { font-size: 26px; font-weight: bold; margin-bottom: 12px; color: #fff; line-height: 1.3; }
+        .header p { font-size: 15px; color: #9ca3af; line-height: 1.6; margin: 6px 0; }
+        .highlight { color: #3b82f6; font-weight: bold; }
 
-        /* 卖家卡片矩阵布局 - 响应式自动换行 */
-        .seller-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-top: 20px; }
+        /* 卖家卡片矩阵布局 - 自适应多列布局 */
+        .seller-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px; margin-top: 20px; }
         
-        /* 卖家独立卡片样式 */
-        .seller-card { background-color: #1f1f23; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; border: 1px solid #29292e; position: relative; }
+        /* 深度还原第二张截图的磨砂黑卡片 */
+        .seller-card { background-color: #151518; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; border: 1px solid #222226; position: relative; box-shadow: 0 4px 20px rgba(0,0,0,0.3); transition: transform 0.2s, border-color 0.2s; }
+        .seller-card:hover { transform: translateY(-4px); border-color: #33333b; }
         
-        /* 商品主图预览区 */
-        .image-container { position: relative; width: 100%; height: 220px; background-color: #29292e; }
-        .nav-arrow { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 14px; cursor: pointer; border: none; }
+        /* 高仿图集轮播组件（带左右箭头切换） */
+        .image-container { position: relative; width: 100%; height: 280px; background-color: #1c1c21; }
+        .seller-img { width: 100%; height: 100%; object-fit: cover; display: none; }
+        .seller-img.active { display: block; }
+        /* 底部精致渐变黑面，确保白色文字清晰可见 */
+        .img-overlay { position: absolute; bottom: 0; left: 0; width: 100%; height: 60px; background: linear-gradient(transparent, rgba(21,21,24,0.95)); }
         
-        /* 卖家核心文本信息布局 */
-        .card-content { padding: 15px; display: flex; flex-direction: column; flex-grow: 1; text-align: left; }
-        .meta-line { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-        .seller-name { font-size: 16px; font-weight: bold; color: #fff; display: flex; align-items: center; gap: 6px; }
-        .verified-badge { color: #38bdf8; font-size: 14px; }
-        .time-tag { font-size: 12px; color: #04d361; }
-        .rating-line { font-size: 12px; color: #ba9f5d; margin-bottom: 12px; }
+        /* 轮播图控制箭头 */
+        .nav-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 14px; cursor: pointer; border: 1px solid #333; z-index: 10; opacity: 0.8; transition: opacity 0.2s; }
+        .nav-arrow:hover { opacity: 1; }
+        .arrow-left { left: 12px; }
+        .arrow-right { right: 12px; }
         
-        /* 截图中的多维分类标签 */
-        .tag-group { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
-        .tag { background-color: #29292e; color: #c4c4cc; padding: 3px 8px; border-radius: 6px; font-size: 11px; border: 1px solid #323238; }
+        /* 卡片文本详情区域 */
+        .card-content { padding: 20px; display: flex; flex-direction: column; flex-grow: 1; text-align: left; }
+        .meta-line { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .seller-name { font-size: 18px; font-weight: bold; color: #fff; display: flex; align-items: center; gap: 6px; }
+        .verified-badge { color: #38bdf8; font-size: 16px; }
+        .time-tag { font-size: 13px; color: #10b981; font-weight: 500; }
+        .rating-line { font-size: 13px; color: #d97706; margin-bottom: 14px; }
         
-        /* 卖家简短个人自我介绍 */
-        .bio { font-size: 13px; color: #a8a8b3; line-height: 1.4; height: 36px; overflow: hidden; margin-bottom: 15px; }
+        /* 深度对齐截图的灰色分类标签组 */
+        .tag-group { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+        .tag { background-color: #222226; color: #d1d5db; padding: 4px 10px; border-radius: 6px; font-size: 12px; border: 1px solid #2d2d34; font-weight: 500; }
         
-        /* 购买动作激活按钮 */
-        .buy-action-btn { background-color: #ef4444; color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; transition: background 0.2s; margin-top: auto; }
+        /* 卖家自述简介文案 */
+        .bio { font-size: 13px; color: #9ca3af; line-height: 1.5; height: 38px; overflow: hidden; margin-bottom: 18px; }
+        
+        /* 商业级高亮霓虹红色按钮 */
+        .buy-action-btn { background-color: #ef4444; color: white; border: none; padding: 13px; width: 100%; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; transition: background 0.2s; margin-top: auto; letter-spacing: 0.5px; }
         .buy-action-btn:hover { background-color: #dc2626; }
 
-        /* 悬浮弹窗收银台模块 (Modal) - 针对手机大屏进行了全自适应调整 */
-        .payment-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 1000; padding: 15px; box-sizing: border-box; }
-        .modal-card { background: #1f1f23; padding: 25px 20px; border-radius: 16px; width: 100%; max-width: 380px; border: 1px solid #29292e; text-align: center; box-sizing: border-box; max-height: 90vh; overflow-y: auto; }
-        .modal-card h3 { color: #fff; margin-top: 0; margin-bottom: 5px; font-size: 18px; }
-        .modal-price { font-size: 24px; font-weight: bold; color: #ef4444; margin: 12px 0; }
+        /* 全自适应磨砂玻璃防断头台收银台 (Modal) */
+        .payment-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); justify-content: center; align-items: center; z-index: 1000; padding: 15px; box-sizing: border-box; }
+        .modal-card { background: #151518; padding: 25px 20px; border-radius: 20px; width: 100%; max-width: 400px; border: 1px solid #2d2d34; text-align: center; box-sizing: border-box; max-height: 92vh; overflow-y: auto; }
+        .modal-card h3 { color: #fff; margin-top: 0; margin-bottom: 4px; font-size: 19px; }
+        .modal-price { font-size: 26px; font-weight: bold; color: #ef4444; margin: 12px 0; }
         
-        /* 支付渠道切换标签页 (Tabs) */
-        .pay-tabs { display: flex; background: #121214; padding: 3px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #29292e; }
-        .tab-btn { flex: 1; background: none; border: none; color: #8d8d99; padding: 8px; font-size: 13px; font-weight: bold; cursor: pointer; border-radius: 6px; outline: none; }
+        /* 双付款渠道高能切卡器 */
+        .pay-tabs { display: flex; background: #0b0b0c; padding: 4px; border-radius: 10px; margin-bottom: 18px; border: 1px solid #222226; }
+        .tab-btn { flex: 1; background: none; border: none; color: #9ca3af; padding: 10px; font-size: 13px; font-weight: bold; cursor: pointer; border-radius: 8px; outline: none; }
         .tab-btn.active { background: #4f46e5; color: #fff; }
         
-        /* 表单单行布局 */
-        .form-row { margin-bottom: 12px; text-align: left; }
-        .modal-card label { display: block; margin-bottom: 5px; color: #c4c4cc; font-size: 13px; }
-        .modal-card input { width: 100%; padding: 11px; border: 1px solid #323238; background: #121214; color: #fff; border-radius: 8px; box-sizing: border-box; font-size: 14px; outline: none; }
+        /* 收银台独立表单样式 */
+        .form-row { margin-bottom: 14px; text-align: left; }
+        .modal-card label { display: block; margin-bottom: 6px; color: #9ca3af; font-size: 13px; font-weight: 500; }
+        .modal-card input { width: 100%; padding: 12px; border: 1px solid #2d2d34; background: #0b0b0c; color: #fff; border-radius: 8px; box-sizing: border-box; font-size: 14px; outline: none; transition: border-color 0.2s; }
         .modal-card input:focus { border-color: #4f46e5; }
-        .split-row { display: flex; gap: 10px; }
+        .split-row { display: flex; gap: 12px; }
         .split-col { flex: 1; }
         
-        .pay-btn { background-color: #4f46e5; color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 8px; }
+        .pay-btn { background-color: #4f46e5; color: white; border: none; padding: 13px; width: 100%; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 10px; }
         .pay-btn:hover { background-color: #4338ca; }
-        .pay-btn:disabled { background-color: #9ca3af; }
-        .modal-close { background: none; border: none; color: #8d8d99; cursor: pointer; font-size: 13px; margin-top: 12px; text-decoration: underline; outline: none; }
-        #msg-box { color: #38bdf8; font-size: 12px; margin-top: 8px; text-align: left; min-height: 18px; line-height: 1.3; }
+        .modal-close { background: none; border: none; color: #9ca3af; cursor: pointer; font-size: 13px; margin-top: 15px; text-decoration: underline; outline: none; }
+        #msg-box { color: #38bdf8; font-size: 12px; margin-top: 8px; text-align: left; min-height: 18px; line-height: 1.4; }
         
-        .footer-nav { text-align: center; margin-top: 30px; font-size: 13px; }
-        .footer-nav a { color: #38bdf8; text-decoration: none; }
+        .footer-nav { text-align: center; margin-top: 50px; font-size: 13px; }
+        .footer-nav a { color: #38bdf8; text-decoration: none; font-weight: 500; }
     </style>
 </head>
 <body>
 
 <div class="market-container">
-    <!-- 顶部文案完全对齐截图 -->
+    <!-- 头部横幅配置 -->
     <div class="header">
         <h1>TastySlips ® – 你的穿过内衣市场与激发你欲望的一切</h1>
         <p>无论您是购买还是出售，安全和谨慎都是我们的首要任务。有了买家保护和完全匿名出售的选择，您始终是安全的。</p>
         <p>现在就来发现 <span class="highlight">400,000 多位卖家</span>中的一小部分。（蓝色勾号表示卖家已通过验证）。</p>
     </div>
 
-    <!-- 卖家卡片矩阵 -->
+    <!-- 卖家网格布局 -->
     <div class="seller-grid">
         
-        <!-- 卡片 1: Julia1 -->
+        <!-- 卖家卡片 1: Tanga-Biene -->
         <div class="seller-card">
-            <div class="image-container">
-                <div style="width:100%; height:100%; background:#29292e; display:flex; align-items:center; justify-content:center; color:#7c7c8a; font-size:13px;">[ Julia1 商品预览图 ]</div>
-                <button class="nav-arrow">❯</button>
+            <div class="image-container" id="slider-tanga">
+                <button class="nav-arrow arrow-left" onclick="moveSlider('slider-tanga', -1)">❮</button>
+                <!-- 精选高画质无版权性感艺术内衣图，完全模拟第二张截图的真实视觉感 -->
+                <img class="seller-img active" src="https://unsplash.com" alt="img1">
+                <img class="seller-img" src="https://unsplash.com" alt="img2">
+                <div class="img-overlay"></div>
+                <button class="nav-arrow arrow-right" onclick="moveSlider('slider-tanga', 1)">❯</button>
             </div>
             <div class="card-content">
                 <div class="meta-line">
-                    <span class="seller-name">Julia1 <span class="verified-badge">✔</span> 🇩🇪</span>
-                    <span class="time-tag">1小时前</span>
+                    <span class="seller-name">Tanga-Biene <span class="verified-badge">✔</span> 🇩🇪</span>
+                    <span class="time-tag">13天前</span>
                 </div>
-                <div class="rating-line">★★★★★ | 28 评论</div>
+                <div class="rating-line">★★★★★ | 150 评论</div>
                 <div class="tag-group">
-                    <span class="tag">31 - 35</span>
-                    <span class="tag">非洲</span>
+                    <span class="tag">25 - 30</span>
+                    <span class="tag">欧洲/高加索人</span>
                     <span class="tag">瘦身</span>
                     <span class="tag">S</span>
                 </div>
-                <div class="bio">欢迎访问我的主页！希望能在这里找到你想要的一切。我是朱莉娅...</div>
-                <button class="buy-action-btn" onclick="openPaymentModal('Julia1', '45.00')">向她购买 (45.00 USD)</button>
+                <div class="bio">欢迎来到我的香氛世界！很高兴你访问我的个人资料，并花时间更多了解我。我是索菲，26...</div>
+                <button class="buy-action-btn" onclick="openPaymentModal('Tanga-Biene', '49.00')">向她购买 (49.00 USD)</button>
             </div>
         </div>
 
-        <!-- 卡片 2: Yulivee -->
+        <!-- 卖家卡片 2: Sophie_M -->
         <div class="seller-card">
-            <div class="image-container">
-                <div style="width:100%; height:100%; background:#29292e; display:flex; align-items:center; justify-content:center; color:#7c7c8a; font-size:13px;">[ Yulivee 商品预览图 ]</div>
-                <button class="nav-arrow">❯</button>
+            <div class="image-container" id="slider-sophie">
+                <button class="nav-arrow arrow-left" onclick="moveSlider('slider-sophie', -1)">❮</button>
+                <img class="seller-img active" src="https://unsplash.com" alt="img1">
+                <img class="seller-img" src="https://unsplash.com" alt="img2">
+                <div class="img-overlay"></div>
+                <button class="nav-arrow arrow-right" onclick="moveSlider('slider-sophie', 1)">❯</button>
             </div>
             <div class="card-content">
                 <div class="meta-line">
-                    <span class="seller-name">Yulivee <span class="verified-badge">✔</span> 🇩🇪</span>
-                    <span class="time-tag">2小时前</span>
+                    <span class="seller-name">Sophie_M <span class="verified-badge">✔</span> 🇳🇱</span>
+                    <span class="time-tag">1小时前</span>
                 </div>
-                <div class="rating-line">★★★★★ | 58 评论</div>
+                <div class="rating-line">★★★★★ | 64 评论</div>
                 <div class="tag-group">
-                    <span class="tag">31 - 35</span>
+                    <span class="tag">36 - 40</span>
                     <span class="tag">欧洲/高加索人</span>
                     <span class="tag">运动型</span>
                     <span class="tag">S</span>
                 </div>
-                <div class="bio">本网站使用cookies来提供其服务和分析流量。探索我独特的私密收藏...</div>
-                <button class="buy-action-btn" onclick="openPaymentModal('Yulivee', '59.00')">向她购买 (59.00 USD)</button>
+                <div class="bio">✨ 袜子、鞋子、内裤和玩具将于10月28日再次供应 🤎 提前下单，通过照片和视频发货...</div>
+                <button class="buy-action-btn" onclick="openPaymentModal('Sophie_M', '68.00')">向她购买 (68.00 USD)</button>
             </div>
         </div>
 
-        <!-- 卡片 3: Deluxe -->
+        <!-- 卖家卡片 3: Xoxoo. -->
         <div class="seller-card">
-            <div class="image-container">
-                <div style="width:100%; height:100%; background:#29292e; display:flex; align-items:center; justify-content:center; color:#7c7c8a; font-size:13px;">[ Deluxe 商品预览图 ]</div>
-                <button class="nav-arrow">❯</button>
-            </div>
-            <div class="card-content">
-                <div class="meta-line">
-                    <span class="seller-name">Deluxe <span class="verified-badge">✔</span> 🇩🇪</span>
-                    <span class="time-tag">18小时前</span>
-                </div>
-                <div class="rating-line">★★★★★ | 322 评论</div>
-                <div class="tag-group">
-                    <span class="tag">25 - 30</span>
-                    <span class="tag">欧洲/高加索人</span>
-                    <span class="tag">正常</span>
-                    <span class="tag">M</span>
-                </div>
-                <div class="bio">谢谢你们的巨大兴趣！每一份订单都是独一无二的，充满了爱与热情...</div>
-                <button class="buy-action-btn" onclick="openPaymentModal('Deluxe', '75.00')">向她购买 (75.00 USD)</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="footer-nav">
-        <a href="admin.html" target="_blank">🛡️ 进入管理员数据控制台 →</a>
-    </div>
-</div>
-
-<!-- 自适应高防收银台弹窗 -->
-<div id="payment-modal" class="payment-modal">
-    <div class="modal-card">
-        <h3 id="modal-seller-title">安全结账</h3>
-        <div class="modal-price" id="modal-item-price">0.00 USD</div>
-        
-        <div class="pay-tabs">
-            <button id="tab-card" class="tab-btn active" onclick="switchChannel('card')">💳 传统银行卡</button>
-            <button id="tab-crypto" class="tab-btn" onclick="switchChannel('crypto')">🪙 USDT (波场链)</button>
-        </div>
-        
-        <form id="pay-form">
+            <div class="image-container" id="slider-xoxoo">
+                <button class="nav-arrow arrow-left" onclick="moveSlider('slider-xoxoo', -1)">❮</button>
